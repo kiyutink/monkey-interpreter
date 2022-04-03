@@ -235,7 +235,9 @@ func (fl *FunctionLiteral) String() string {
 	buf.WriteString("(")
 	buf.WriteString(strings.Join(params, ", "))
 	buf.WriteString(")")
+	buf.WriteString("{")
 	buf.WriteString(fl.Body.String())
+	buf.WriteString("}")
 
 	return buf.String()
 }
@@ -265,7 +267,7 @@ func (ce *CallExpression) String() string {
 }
 
 type StringLiteral struct {
-	Token   token.Token // The String token
+	Token token.Token // The String token
 	Value string
 }
 
