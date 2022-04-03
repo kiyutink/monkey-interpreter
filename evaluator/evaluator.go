@@ -190,8 +190,6 @@ func evalInfixStringExpression(op string, left object.Object, right object.Objec
 	leftVal := left.(*object.String).Value
 	rightVal := right.(*object.String).Value
 
-	fmt.Println(op)
-
 	if op == "+" {
 		return &object.String{Value: leftVal + rightVal}
 	}
