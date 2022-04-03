@@ -123,6 +123,37 @@ func testLetStatement(t *testing.T, statement ast.Statement, expectedIdentifer s
 	return true
 }
 
+func TestParsingStrings(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{`"foobar"`, "foobar"},
+		{`"foo bar"`, "foo bar"},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Errorf("Expected program to have 1 statement, instead got %v", len(program.Statements))
+		}
+
+		expr := program.Statements[0].(*ast.ExpressionStatement)
+		str, ok := expr.Expression.(*ast.StringLiteral)
+		if !ok {
+			t.Errorf("Expected to receive a StringLiteral, instead got %T", expr)
+		}
+
+		if str.Literal != tt.expected {
+			t.Errorf("Expected string literal to be equal to %v, instead got %v", tt.expected, str.Literal)
+		}
+	}
+
+}
 func TestIdentifierExpression(t *testing.T) {
 	input := "foobar;"
 
