@@ -162,6 +162,9 @@ func evalInfixExpression(op string, left object.Object, right object.Object) obj
 	case left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ:
 		return evalInfixIntegerExpression(op, left, right)
 
+	case left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ:
+		return evalInfixStringExpression(op, left, right)
+
 	// After here at least one of the operands is a bool
 	case op == "==":
 		return nativeBoolToBooleanObject(left == right)
@@ -181,6 +184,20 @@ func evalPrefixExpression(op string, right object.Object) object.Object {
 	default:
 		return newError("unknown operator: %v %v", op, right.Type())
 	}
+}
+
+func evalInfixStringExpression(op string, left object.Object, right object.Object) object.Object {
+	leftVal := left.(*object.String).Value
+	rightVal := right.(*object.String).Value
+
+	fmt.Println(op)
+
+	if op == "+" {
+		return &object.String{Value: leftVal + rightVal}
+	}
+
+	return newError("unknown operator: %v %v %v",
+		left.Type(), op, right.Type())
 }
 
 func evalInfixIntegerExpression(op string, left object.Object, right object.Object) object.Object {

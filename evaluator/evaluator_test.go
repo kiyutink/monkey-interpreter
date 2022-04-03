@@ -35,6 +35,30 @@ func TestEvalIntegerExpression(t *testing.T) {
 	}
 }
 
+func TestStringConcatenation(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{`"foo" + "bar";`, "foobar"},
+		{`"foo" + "";`, "foo"},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+
+		str, ok := evaluated.(*object.String)
+		if !ok {
+			t.Errorf("Expected a String object, instead got %T (%+v)", evaluated, evaluated)
+			continue;
+		}
+
+		if str.Value != tt.expected {
+			t.Errorf("Expected String value to be %v, instead got %v", tt.expected, str.Value)
+		}
+	}
+}
+
 func TestEvalBooleanExpression(t *testing.T) {
 	tests := []struct {
 		input    string
@@ -176,6 +200,8 @@ func TestErrorHandling(t *testing.T) {
 			"foobar",
 			"identifier not found: foobar",
 		},
+		{`"foobar" - "bar";`, "unknown operator: STRING - STRING"},
+		{`"foobar" * "bar";`, "unknown operator: STRING * STRING"},
 	}
 
 	for _, tt := range tests {
