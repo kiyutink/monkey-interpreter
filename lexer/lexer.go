@@ -1,6 +1,8 @@
 package lexer
 
-import "monkey-interpreter/token"
+import (
+	"monkey-interpreter/token"
+)
 
 type Lexer struct {
 	input        string
@@ -43,6 +45,15 @@ func (l *Lexer) readIdentifier() string {
 		l.readChar()
 	}
 
+	return l.input[pos:l.position]
+}
+
+func (l *Lexer) readString() string {
+	l.readChar()
+	pos := l.position
+	for l.ch != '"' && l.ch != 0 {
+		l.readChar()
+	}
 	return l.input[pos:l.position]
 }
 
@@ -102,6 +113,10 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.SLASH, l.ch)
 	case '*':
 		tok = newToken(token.ASTERISK, l.ch)
+
+	case '"':
+		tok.Type = token.STRING
+		tok.Literal = l.readString()
 
 	case 0:
 		tok.Literal = ""
