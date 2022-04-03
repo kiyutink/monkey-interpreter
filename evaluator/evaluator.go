@@ -100,16 +100,18 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {
-	function, ok := fn.(*object.Function)
-
-	if !ok {
+	switch function := fn.(type) {
+	case *object.Function:
+		callEnv := object.NewEnclosedEnvironment(function.Env)
+		for i, arg := range args {
+			callEnv.Set(function.Parameters[i].Value, arg)
+		}
+		return unwrapReturnValue(evalBlockStatement(function.Body, callEnv))
+	case *object.Builtin:
+		return function.Fn(args...)
+	default:
 		return newError("not a function: %v", fn.Type())
 	}
-	callEnv := object.NewEnclosedEnvironment(function.Env)
-	for i, arg := range args {
-		callEnv.Set(function.Parameters[i].Value, arg)
-	}
-	return unwrapReturnValue(evalBlockStatement(function.Body, callEnv))
 }
 
 func unwrapReturnValue(obj object.Object) object.Object {
@@ -135,6 +137,11 @@ func evalExpressions(nodes []ast.Expression, env *object.Environment) []object.O
 
 func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
 	val, ok := env.Get(node.Value)
+	
+	if builtin, ok := builtins[node.Value]; ok {
+		return builtin
+	}
+
 	if !ok {
 		return newError("identifier not found: " + node.Value)
 	}

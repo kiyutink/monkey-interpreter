@@ -50,7 +50,7 @@ func TestStringConcatenation(t *testing.T) {
 		str, ok := evaluated.(*object.String)
 		if !ok {
 			t.Errorf("Expected a String object, instead got %T (%+v)", evaluated, evaluated)
-			continue;
+			continue
 		}
 
 		if str.Value != tt.expected {
@@ -302,6 +302,37 @@ func TestClosures(t *testing.T) {
 	testIntegerObject(t, testEval(input), 4)
 }
 
+func TestBuiltinFunctions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`len("")`, 0},
+		{`len("abc")`, 3},
+		{`len("hello world!")`, 12},
+		{`len(1)`, "argument to `len` not supported, got INTEGER"},
+		{`len("one", "two")`, "wrong number of arguments. got=2, want=1"},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		switch expected := tt.expected.(type) {
+		case int:
+			testIntegerObject(t, evaluated, int64(expected))
+
+		case string:
+			errObj, ok := evaluated.(*object.Error)
+			if !ok {
+				t.Errorf("Expected an Error object, instead got %T (%+v)", evaluated, evaluated)
+				continue;
+			}
+			if errObj.Message != expected {
+				t.Errorf("Expected Message to be %v, instead got %v", expected, errObj.Message)
+			}
+		}
+	}
+}
+
 func testNullObject(t *testing.T, obj object.Object) bool {
 	if obj != NULL {
 		t.Errorf("Expected object to be NULL, instead got %T (%+v)", obj, obj)
@@ -314,7 +345,7 @@ func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {
 	result, ok := obj.(*object.Integer)
 
 	if !ok {
-		t.Errorf("Expected object to be Integer, instead got %T", obj)
+		t.Errorf("Expected object to be Integer, instead got %T (%v)", obj, obj)
 		return false
 	}
 
