@@ -148,8 +148,8 @@ func TestParsingStrings(t *testing.T) {
 			t.Errorf("Expected to receive a StringLiteral, instead got %T", expr)
 		}
 
-		if str.Literal != tt.expected {
-			t.Errorf("Expected string literal to be equal to %v, instead got %v", tt.expected, str.Literal)
+		if str.Value != tt.expected {
+			t.Errorf("Expected string literal to be equal to %v, instead got %v", tt.expected, str.Value)
 		}
 	}
 

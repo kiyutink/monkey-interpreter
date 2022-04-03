@@ -234,6 +234,21 @@ func TestFunctionObject(t *testing.T) {
 	}
 }
 
+func TestStringObject(t *testing.T) {
+	input := `"foobar";`
+	expected := "foobar"
+	evaluated := testEval(input)
+
+	str, ok := evaluated.(*object.String)
+	if !ok {
+		t.Fatalf("Expected a String object, instead got %T", evaluated)
+	}
+
+	if str.Value != expected {
+		t.Fatalf("Expected String object to have value %v, instead got %v", expected, str.Value)
+	}
+}
+
 func TestFunctionApplication(t *testing.T) {
 	tests := []struct {
 		input    string
