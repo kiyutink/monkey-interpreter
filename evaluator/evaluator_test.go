@@ -324,13 +324,31 @@ func TestBuiltinFunctions(t *testing.T) {
 			errObj, ok := evaluated.(*object.Error)
 			if !ok {
 				t.Errorf("Expected an Error object, instead got %T (%+v)", evaluated, evaluated)
-				continue;
+				continue
 			}
 			if errObj.Message != expected {
 				t.Errorf("Expected Message to be %v, instead got %v", expected, errObj.Message)
 			}
 		}
 	}
+}
+
+func TestArrayLiterals(t *testing.T) {
+	input := "[1, 2 + 3, 4 * 5];"
+	evaluated := testEval(input)
+
+	arr, ok := evaluated.(*object.Array)
+	if !ok {
+		t.Fatalf("Expected object to be Array, instead got %T", evaluated)
+	}
+
+	if len(arr.Elements) != 3 {
+		t.Fatalf("Expected array to have 3 elements, instead got %v", len(arr.Elements))
+	}
+
+	testIntegerObject(t, arr.Elements[0], 1)
+	testIntegerObject(t, arr.Elements[1], 5)
+	testIntegerObject(t, arr.Elements[2], 20)
 }
 
 func testNullObject(t *testing.T, obj object.Object) bool {

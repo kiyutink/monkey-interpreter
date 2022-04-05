@@ -62,6 +62,13 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		return applyFunction(function, args)
 
+	case *ast.ArrayLiteral:
+		elements := evalExpressions(node.Elements, env)
+		if len(elements) == 1 && isError(elements[0]) {
+			return elements[0]
+		}
+		return &object.Array{Elements: elements}
+
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
 
@@ -137,7 +144,7 @@ func evalExpressions(nodes []ast.Expression, env *object.Environment) []object.O
 
 func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
 	val, ok := env.Get(node.Value)
-	
+
 	if builtin, ok := builtins[node.Value]; ok {
 		return builtin
 	}
