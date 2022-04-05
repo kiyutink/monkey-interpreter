@@ -101,7 +101,7 @@ type String struct {
 }
 
 func (s *String) Type() ObjectType { return STRING_OBJ }
-func (s *String) Inspect() string  { return s.Value }
+func (s *String) Inspect() string  { return `"` + s.Value + `"` }
 
 type BuiltinFn func(args ...Object) Object
 type Builtin struct {
