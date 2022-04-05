@@ -300,3 +300,20 @@ func (al *ArrayLiteral) String() string {
 	buf.WriteByte(']')
 	return buf.String()
 }
+
+type IndexExpression struct {
+	Token token.Token // the "[" token
+	Left  Expression
+	Index Expression
+}
+
+func (ie *IndexExpression) expressionNode()      {}
+func (ie *IndexExpression) TokenLiteral() string { return ie.Token.Literal }
+func (ie *IndexExpression) String() string {
+	buf := bytes.Buffer{}
+	buf.WriteString(ie.Left.String())
+	buf.WriteString("([")
+	buf.WriteString(ie.Index.String())
+	buf.WriteString("])")
+	return buf.String()
+}

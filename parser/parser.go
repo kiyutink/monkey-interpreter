@@ -13,10 +13,11 @@ const (
 	LOWEST
 	EQUALS      // ==
 	LESSGREATER // > or <
-	SUM         //+
-	PRODUCT     //*
-	PREFIX      //-X or !X
+	SUM         // +
+	PRODUCT     // *
+	PREFIX      // -X or !X
 	CALL        // myFunction(X)
+	INDEX       // array[index]
 )
 
 type prefixParseFn func() ast.Expression
@@ -64,6 +65,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfixFn(token.LT, p.parseInfixExpression)
 	p.registerInfixFn(token.GT, p.parseInfixExpression)
 	p.registerInfixFn(token.LPAREN, p.parseCallExpression)
+	p.registerInfixFn(token.LBRACKET, p.parseIndexExpression)
 
 	p.nextToken()
 	p.nextToken()
@@ -194,6 +196,7 @@ var precedences = map[token.TokenType]int{token.EQ: EQUALS,
 	token.SLASH:    PRODUCT,
 	token.ASTERISK: PRODUCT,
 	token.LPAREN:   CALL,
+	token.LBRACKET:   INDEX,
 }
 
 func (p *Parser) parseGroupedExpression() ast.Expression {
@@ -338,6 +341,16 @@ func (p *Parser) parseArrayLiteral() ast.Expression {
 	}
 	al.Elements = p.parseExpressionList(token.RBRACKET)
 	return al
+}
+
+func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
+	indexExp := &ast.IndexExpression{Left: left}
+	p.nextToken()
+	indexExp.Index = p.parseExpression(LOWEST)
+	if !p.expectPeek(token.RBRACKET) {
+		return nil
+	}
+	return indexExp
 }
 
 func (p *Parser) parseExpression(precedence int) ast.Expression {
