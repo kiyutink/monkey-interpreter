@@ -54,6 +54,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefixFn(token.FUNCTION, p.parseFunctionLiteral)
 	p.registerPrefixFn(token.STRING, p.parseStringLiteral)
 	p.registerPrefixFn(token.LBRACKET, p.parseArrayLiteral)
+	p.registerPrefixFn(token.LBRACE, p.parseHashLiteral)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfixFn(token.PLUS, p.parseInfixExpression)
@@ -196,7 +197,7 @@ var precedences = map[token.TokenType]int{token.EQ: EQUALS,
 	token.SLASH:    PRODUCT,
 	token.ASTERISK: PRODUCT,
 	token.LPAREN:   CALL,
-	token.LBRACKET:   INDEX,
+	token.LBRACKET: INDEX,
 }
 
 func (p *Parser) parseGroupedExpression() ast.Expression {
@@ -341,6 +342,31 @@ func (p *Parser) parseArrayLiteral() ast.Expression {
 	}
 	al.Elements = p.parseExpressionList(token.RBRACKET)
 	return al
+}
+
+func (p *Parser) parseHashLiteral() ast.Expression {
+	hl := &ast.HashLiteral{Token: p.curToken, Pairs: make(map[ast.Expression]ast.Expression)}
+
+	for !p.peekTokenIs(token.RBRACE) {
+		p.nextToken()
+		key := p.parseExpression(LOWEST)
+
+		if !p.expectPeek(token.COLON) {
+			return nil
+		}
+		p.nextToken()
+		val := p.parseExpression(LOWEST)
+		hl.Pairs[key] = val
+		if !p.peekTokenIs(token.RBRACE) && !p.expectPeek(token.COMMA) {
+			return nil
+		}
+	}
+
+	if !p.expectPeek(token.RBRACE) {
+		return nil
+	}
+
+	return hl
 }
 
 func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
