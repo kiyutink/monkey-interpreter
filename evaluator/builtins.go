@@ -86,7 +86,7 @@ func push(args ...object.Object) object.Object {
 	if !ok {
 		return &object.Error{Message: fmt.Sprintf("argument to `push` not supported, got %v", args[0].Type())}
 	}
-	
+
 	return &object.Array{
 		Elements: append(arr.Elements, args[1]),
 	}
