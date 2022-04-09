@@ -4,8 +4,9 @@ package ast
 
 import (
 	"bytes"
-	"monkey-interpreter/token"
 	"strings"
+
+	"monkey-interpreter/token"
 )
 
 type Node interface {
@@ -118,6 +119,7 @@ func (il *IntegerLiteral) expressionNode() {}
 func (il *IntegerLiteral) TokenLiteral() string {
 	return il.Token.Literal
 }
+
 func (il *IntegerLiteral) String() string {
 	return il.Token.Literal
 }
@@ -132,6 +134,7 @@ func (pe *PrefixExpression) expressionNode() {}
 func (pe *PrefixExpression) TokenLiteral() string {
 	return pe.Token.Literal
 }
+
 func (pe *PrefixExpression) String() string {
 	buf := bytes.Buffer{}
 	buf.WriteString("(")
@@ -152,6 +155,7 @@ func (ie *InfixExpression) expressionNode() {}
 func (ie *InfixExpression) TokenLiteral() string {
 	return ie.Token.Literal
 }
+
 func (ie *InfixExpression) String() string {
 	buf := bytes.Buffer{}
 	buf.WriteString("(")
@@ -171,6 +175,7 @@ func (b *BooleanExpression) expressionNode() {}
 func (b *BooleanExpression) TokenLiteral() string {
 	return b.Token.Literal
 }
+
 func (b *BooleanExpression) String() string {
 	return b.Token.Literal
 }
@@ -207,6 +212,7 @@ func (bs *BlockStatement) statementNode() {}
 func (bs *BlockStatement) TokenLiteral() string {
 	return bs.Token.Literal
 }
+
 func (bs *BlockStatement) String() string {
 	var buf bytes.Buffer
 	for _, s := range bs.Statements {
@@ -225,6 +231,7 @@ func (fl *FunctionLiteral) expressionNode() {}
 func (fl *FunctionLiteral) TokenLiteral() string {
 	return fl.Token.Literal
 }
+
 func (fl *FunctionLiteral) String() string {
 	var buf bytes.Buffer
 	params := []string{}

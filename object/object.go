@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"hash/fnv"
-	"monkey-interpreter/ast"
 	"strings"
+
+	"monkey-interpreter/ast"
 )
 
 type ObjectType string
@@ -35,9 +36,11 @@ type Integer struct {
 func (i *Integer) Type() ObjectType {
 	return INTEGER_OBJ
 }
+
 func (i *Integer) Inspect() string {
 	return fmt.Sprintf("%d", i.Value)
 }
+
 func (i *Integer) HashKey() HashKey {
 	return HashKey{Type: INTEGER_OBJ, Value: uint64(i.Value)}
 }
@@ -49,9 +52,11 @@ type Boolean struct {
 func (b *Boolean) Type() ObjectType {
 	return BOOLEAN_OBJ
 }
+
 func (b *Boolean) Inspect() string {
 	return fmt.Sprintf("%t", b.Value)
 }
+
 func (b *Boolean) HashKey() HashKey {
 	value := 0
 	if b.Value {
@@ -88,6 +93,7 @@ type Function struct {
 func (f *Function) Type() ObjectType {
 	return FUNCTION_OBJ
 }
+
 func (f *Function) Inspect() string {
 	buf := bytes.Buffer{}
 
@@ -123,10 +129,12 @@ func (s *String) HashKey() HashKey {
 	return hk
 }
 
-type BuiltinFn func(args ...Object) Object
-type Builtin struct {
-	Fn BuiltinFn
-}
+type (
+	BuiltinFn func(args ...Object) Object
+	Builtin   struct {
+		Fn BuiltinFn
+	}
+)
 
 func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
 func (b *Builtin) Inspect() string  { return "builtin function" }

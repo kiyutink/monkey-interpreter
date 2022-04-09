@@ -2,10 +2,11 @@ package parser
 
 import (
 	"fmt"
+	"strconv"
+
 	"monkey-interpreter/ast"
 	"monkey-interpreter/lexer"
 	"monkey-interpreter/token"
-	"strconv"
 )
 
 const (
@@ -20,8 +21,10 @@ const (
 	INDEX       // array[index]
 )
 
-type prefixParseFn func() ast.Expression
-type infixParseFn func(ast.Expression) ast.Expression
+type (
+	prefixParseFn func() ast.Expression
+	infixParseFn  func(ast.Expression) ast.Expression
+)
 
 type Parser struct {
 	l              *lexer.Lexer
@@ -188,7 +191,8 @@ func (p *Parser) noPrefixParseFuncError(t token.TokenType) {
 	p.errors = append(p.errors, msg)
 }
 
-var precedences = map[token.TokenType]int{token.EQ: EQUALS,
+var precedences = map[token.TokenType]int{
+	token.EQ:       EQUALS,
 	token.NOT_EQ:   EQUALS,
 	token.LT:       LESSGREATER,
 	token.GT:       LESSGREATER,

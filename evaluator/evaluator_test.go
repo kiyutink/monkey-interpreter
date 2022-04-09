@@ -1,10 +1,11 @@
 package evaluator
 
 import (
+	"testing"
+
 	"monkey-interpreter/lexer"
 	"monkey-interpreter/object"
 	"monkey-interpreter/parser"
-	"testing"
 )
 
 func TestEvalIntegerExpression(t *testing.T) {
@@ -178,7 +179,8 @@ func TestErrorHandling(t *testing.T) {
 		{
 			"true + false;",
 			"unknown operator: BOOLEAN + BOOLEAN",
-		}, {
+		},
+		{
 			"5; true + false; 5",
 			"unknown operator: BOOLEAN + BOOLEAN",
 		},
@@ -449,6 +451,7 @@ func TestHashLiterals(t *testing.T) {
 		testIntegerObject(t, evaluatedPair.Value, value)
 	}
 }
+
 func TestHashIndexExpressions(t *testing.T) {
 	tests := []struct {
 		input    string

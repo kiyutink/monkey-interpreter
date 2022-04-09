@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+
 	"monkey-interpreter/ast"
 	"monkey-interpreter/object"
 )
@@ -170,7 +171,6 @@ func evalIndexExpression(left object.Object, index object.Object) object.Object 
 	default:
 		return NULL
 	}
-
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {

@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"monkey-interpreter/repl"
 	"os"
 	"os/user"
+
+	"monkey-interpreter/repl"
 )
 
 func main() {

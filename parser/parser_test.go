@@ -2,13 +2,13 @@ package parser
 
 import (
 	"fmt"
+	"testing"
+
 	"monkey-interpreter/ast"
 	"monkey-interpreter/lexer"
-	"testing"
 )
 
 func TestReturnStatements(t *testing.T) {
-
 	tests := []struct {
 		input              string
 		expectedExpression interface{}
@@ -152,8 +152,8 @@ func TestParsingStrings(t *testing.T) {
 			t.Errorf("Expected string literal to be equal to %v, instead got %v", tt.expected, str.Value)
 		}
 	}
-
 }
+
 func TestIdentifierExpression(t *testing.T) {
 	input := "foobar;"
 
@@ -472,7 +472,8 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{
 			"3 > 5 == false",
 			"((3 > 5) == false)",
-		}, {
+		},
+		{
 			"3 < 5 == true",
 			"((3 < 5) == true)",
 		},
