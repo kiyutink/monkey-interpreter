@@ -146,15 +146,31 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 }
 
 func evalIndexExpression(left object.Object, index object.Object) object.Object {
-	arrayObject := left.(*object.Array)
-	idx := index.(*object.Integer).Value
+	switch left := left.(type) {
+	case *object.Array:
+		idx := index.(*object.Integer).Value
+		max := int64(len(left.Elements) - 1)
+		if idx < 0 || idx > max {
+			return NULL
+		}
 
-	max := int64(len(arrayObject.Elements) - 1)
-	if idx < 0 || idx > max {
+		return left.Elements[idx]
+
+	case *object.Hash:
+		key, ok := index.(object.Hashable)
+		if !ok {
+			return newError("unusable as hash key: %v", index.Type())
+		}
+		pair, ok := left.Pairs[key.HashKey()]
+		if !ok {
+			return NULL
+		}
+		return pair.Value
+
+	default:
 		return NULL
 	}
 
-	return arrayObject.Elements[idx]
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {
