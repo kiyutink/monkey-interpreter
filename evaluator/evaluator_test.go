@@ -406,6 +406,46 @@ func TestArrayIndexExpressions(t *testing.T) {
 	}
 }
 
+func TestHashLiterals(t *testing.T) {
+	input := `let two = "two";
+	{
+		"one": 10 - 9,
+		two: 1 + 1,
+		"thr" + "ee": 6 / 2,
+		4: 4,
+		true: 5,
+		false: 6
+	}`
+
+	evaluated := testEval(input)
+	result, ok := evaluated.(*object.Hash)
+
+	if !ok {
+		t.Fatalf("Expected a Hash, instead got %T(%+v)", evaluated, evaluated)
+	}
+
+	expected := map[object.HashKey]int64{
+		(&object.String{Value: "one"}).HashKey():     1,
+		(&object.String{Value: "two"}).HashKey():     2,
+		(&object.String{Value: "three"}).HashKey():   3,
+		(&object.Integer{Value: int64(4)}).HashKey(): 4,
+		(&object.Boolean{Value: true}).HashKey():     5,
+		(&object.Boolean{Value: false}).HashKey():    6,
+	}
+
+	if len(expected) != len(result.Pairs) {
+		t.Fatalf("The length are not equal, expected %v, received %v", len(expected), len(result.Pairs))
+	}
+
+	for key, value := range expected {
+		evaluatedPair, ok := result.Pairs[key]
+		if !ok {
+			t.Errorf("Value for key is absent")
+		}
+		testIntegerObject(t, evaluatedPair.Value, value)
+	}
+}
+
 func testNullObject(t *testing.T, obj object.Object) bool {
 	if obj != NULL {
 		t.Errorf("Expected object to be NULL, instead got %T (%+v)", obj, obj)

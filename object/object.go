@@ -3,6 +3,7 @@ package object
 import (
 	"bytes"
 	"fmt"
+	"hash/fnv"
 	"monkey-interpreter/ast"
 	"strings"
 )
@@ -19,6 +20,7 @@ const (
 	STRING_OBJ       = "STRING"
 	BUILTIN_OBJ      = "BUILTIN"
 	ARRAY_OBJ        = "ARRAY"
+	HASH_OBJ         = "HASH"
 )
 
 type Object interface {
@@ -36,6 +38,9 @@ func (i *Integer) Type() ObjectType {
 func (i *Integer) Inspect() string {
 	return fmt.Sprintf("%d", i.Value)
 }
+func (i *Integer) HashKey() HashKey {
+	return HashKey{Type: INTEGER_OBJ, Value: uint64(i.Value)}
+}
 
 type Boolean struct {
 	Value bool
@@ -46,6 +51,13 @@ func (b *Boolean) Type() ObjectType {
 }
 func (b *Boolean) Inspect() string {
 	return fmt.Sprintf("%t", b.Value)
+}
+func (b *Boolean) HashKey() HashKey {
+	value := 0
+	if b.Value {
+		value = 1
+	}
+	return HashKey{Type: BOOLEAN_OBJ, Value: uint64(value)}
 }
 
 type Null struct{}
@@ -102,6 +114,14 @@ type String struct {
 
 func (s *String) Type() ObjectType { return STRING_OBJ }
 func (s *String) Inspect() string  { return `"` + s.Value + `"` }
+func (s *String) HashKey() HashKey {
+	hk := HashKey{Type: STRING_OBJ}
+
+	h := fnv.New64a()
+	h.Write([]byte(s.Value))
+	hk.Value = h.Sum64()
+	return hk
+}
 
 type BuiltinFn func(args ...Object) Object
 type Builtin struct {
@@ -126,4 +146,38 @@ func (a *Array) Inspect() string {
 	out.WriteString(strings.Join(elements, ", "))
 	out.WriteString("]")
 	return out.String()
+}
+
+type HashKey struct {
+	Type  ObjectType
+	Value uint64
+}
+
+type HashPair struct {
+	Key   Object
+	Value Object
+}
+type Hash struct {
+	Pairs map[HashKey]HashPair
+}
+
+func (h *Hash) Type() ObjectType { return HASH_OBJ }
+func (h *Hash) Inspect() string {
+	buf := bytes.Buffer{}
+
+	pairs := []string{}
+
+	for _, pair := range h.Pairs {
+		pairs = append(pairs, strings.Join([]string{pair.Key.Inspect(), pair.Value.Inspect()}, " : "))
+	}
+
+	buf.WriteString("{\n")
+	buf.WriteString(strings.Join(pairs, ",\n"))
+	buf.WriteString("\n}")
+
+	return buf.String()
+}
+
+type Hashable interface {
+	HashKey() HashKey
 }

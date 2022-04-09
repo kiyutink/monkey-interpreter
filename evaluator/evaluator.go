@@ -39,6 +39,33 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 	// Expressions
 
+	case *ast.HashLiteral:
+		pairs := make(map[object.HashKey]object.HashPair)
+		for key, value := range node.Pairs {
+			keyObj := Eval(key, env)
+			if isError(keyObj) {
+				return keyObj
+			}
+			hashableKey, ok := keyObj.(object.Hashable)
+			if !ok {
+				return newError("Can't use expression of type %v as hash key", keyObj.Type())
+			}
+
+			valObj := Eval(value, env)
+			if isError(valObj) {
+				return valObj
+			}
+
+			pairs[hashableKey.HashKey()] = object.HashPair{
+				Value: valObj,
+				Key:   keyObj,
+			}
+		}
+
+		return &object.Hash{
+			Pairs: pairs,
+		}
+
 	case *ast.StringLiteral:
 		return &object.String{Value: node.Value}
 
