@@ -92,6 +92,13 @@ func push(args ...object.Object) object.Object {
 	}
 }
 
+func puts(args ...object.Object) object.Object {
+	for _, arg := range args {
+		fmt.Println(arg.Inspect())
+	}
+	return NULL
+}
+
 var builtins = map[string]*object.Builtin{
 	"len": {
 		Fn: length,
@@ -107,5 +114,8 @@ var builtins = map[string]*object.Builtin{
 	},
 	"push": {
 		Fn: push,
+	},
+	"puts": {
+		Fn: puts,
 	},
 }
